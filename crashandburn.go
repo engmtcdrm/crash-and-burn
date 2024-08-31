@@ -57,7 +57,7 @@ func main() {
 	args := os.Args
 
 	// Parse command line arguments
-	for i := 0; i < len(args); i++ {
+	for i := 1; i < len(args); i++ {
 		if args[i] == "-d" || args[i] == "--debug" {
 			debug = true
 		} else if args[i] == "-r" || args[i] == "--random-range" {
