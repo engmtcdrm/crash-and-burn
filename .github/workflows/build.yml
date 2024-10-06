@@ -28,6 +28,8 @@ jobs:
       - name: Install dependencies
         run: go get .
 
+      - run: echo "REPO_NAME=$(basename ${{ github.repository }})" >> $GITHUB_ENV
+
       - name: Build
         run: go build -v ./...
 
@@ -37,5 +39,5 @@ jobs:
       - name: Upload Go executable
         uses: actions/upload-artifact@v4
         with:
-          name: $(basename ${{ github.repository }})-${{ matrix.os }}-${{ matrix.go-version }}
+          name: ${{ env.REPO_NAME }}-${{ matrix.os }}-${{ matrix.go-version }}
           path: ${{ github.repository }}
