@@ -3,11 +3,7 @@
 
 name: Go
 
-on:
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+on: [push, pull_request]
 
 jobs:
 
@@ -28,10 +24,11 @@ jobs:
       - name: Install dependencies
         run: go get .
 
-      - run: echo "REPO_NAME=$(basename ${{ github.repository }})" >> $GITHUB_ENV
+      # - run: echo "REPO_NAME=$(basename ${{ github.repository }})" >> $GITHUB_ENV
 
       - name: Build
-        run: go build -v -o ${{ env.REPO_NAME }} ./...
+        # run: go build -v -o ${{ env.REPO_NAME }} ./...
+        run: go build -v ./...
 
       - name: Test
         run: go test -v ./...
