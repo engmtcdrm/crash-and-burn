@@ -55,7 +55,7 @@ func contains(slice []int, value int) bool {
 
 // pluralize returns "s" if the count is not 1, otherwise returns an empty string.
 func pluralize(count int) string {
-	if count == 1 {
+	if count == 1 || count == -1 {
 		return ""
 	}
 	return "s"
