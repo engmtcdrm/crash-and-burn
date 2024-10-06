@@ -39,5 +39,6 @@ jobs:
       - name: Upload Go executable
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.REPO_NAME }}-${{ matrix.os }}-${{ matrix.go-version }}
-          path: ${{ github.repository }}
+          name: ${{ env.REPO_NAME }}-${{ matrix.os }}
+          path: |
+            ${{ github.workspace }}/${{ env.REPO_NAME }}${{ matrix.os == 'windows-latest' && '.exe' || '' }}
