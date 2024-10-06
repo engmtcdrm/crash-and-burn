@@ -1,5 +1,7 @@
 # crash-and-burn
 
+<a href="https://github.com/engmtcdrm/crash-and-burn/actions"><img src="https://github.com/engmtcdrm/crash-and-burn/actions/workflows/build.yml/badge.svg?branch=main" alt="Build Status"></a>
+
 A simple utility for randomly generating error, warning, and success return codes.
 
 This utility program is meant to be used for development of other programs that may call subprocesses to do something.
