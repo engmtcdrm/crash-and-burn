@@ -16,7 +16,7 @@ const (
 )
 
 var (
-	debug     bool
+	verbose   bool
 	errPct    int
 	errRc     int
 	warnPct   int
@@ -92,9 +92,9 @@ func init() {
 	pflag.IntVar(&warnPct, "warn-pct", 30, "set the warning percentage (between 0-100)")
 	pflag.IntVar(&warnRc, "warn-rc", 1, "set the warning return code (between 0-255)")
 	pflag.IntVarP(&sleepTime, "sleep", "s", 0, "set the sleep time in seconds (must be greater or equal to 0) (default: random value between 0-10 seconds)")
-	pflag.BoolVarP(&debug, "debug", "d", false, "enable debug mode")
+	pflag.BoolVarP(&verbose, "verbose", "v", false, "enable verbose output")
 	pflag.BoolP("help", "h", false, fmt.Sprintf("help for %s", AppName))
-	pflag.BoolP("version", "v", false, fmt.Sprintf("version of %s", AppName))
+	pflag.Bool("version", false, fmt.Sprintf("version of %s", AppName))
 	pflag.CommandLine.SortFlags = false
 
 	pflag.Parse()
@@ -126,51 +126,65 @@ func init() {
 }
 
 func main() {
-	fmt.Println("Welcome to", AppName)
-	fmt.Println("Version:", AppVersion)
-	fmt.Println("")
-	fmt.Println("Using the following settings:")
-	fmt.Println("    - Error percentage:", errPct)
-	fmt.Println("    - Error return code:", errRc)
-	fmt.Println("    - Warning percentage:", warnPct)
-	fmt.Println("    - Warning return code:", warnRc)
-	fmt.Println("    - Sleep time:", sleepDur.String())
+	if verbose {
+		fmt.Println("Welcome to", AppName)
+		fmt.Println("Version:", AppVersion)
+		fmt.Println("")
+		fmt.Println("Using the following settings:")
+		fmt.Println("    - Error percentage:", errPct)
+		fmt.Println("    - Error return code:", errRc)
+		fmt.Println("    - Warning percentage:", warnPct)
+		fmt.Println("    - Warning return code:", warnRc)
+		fmt.Println("    - Sleep time:", sleepDur.String())
+	}
 
 	randErrNbrs := genRandomNumbers(errPct)
 	randWarnNbrs := genRandomNumbers(warnPct)
 
-	if debug {
+	if verbose {
 		fmt.Println("")
 
 		for i := 0; i < len(randErrNbrs); i++ {
-			fmt.Println("DEBUG: Error number:", randErrNbrs[i])
+			fmt.Println("Randomly Generated Error number:", randErrNbrs[i])
 		}
 
 		fmt.Println("")
 
 		for i := 0; i < len(randWarnNbrs); i++ {
-			fmt.Println("DEBUG: Warning number:", randWarnNbrs[i])
+			fmt.Println("Randomly Generated Warning number:", randWarnNbrs[i])
 		}
 	}
 
 	randVal := rand.Int() % 100
 
-	fmt.Println("")
-	fmt.Printf("Sleeping for %d second%s...\n", sleepTime, pluralize(sleepTime))
+	if verbose {
+		fmt.Println("")
+		fmt.Printf("Sleeping for %d second%s...\n", sleepTime, pluralize(sleepTime))
+	}
+
 	time.Sleep(sleepDur)
-	fmt.Println("")
+
+	if verbose {
+		fmt.Println("")
+	}
 
 	if contains(randErrNbrs, randVal) {
-		fmt.Println("ERROR with return code of", errRc)
+		if verbose {
+			fmt.Println("ERROR with return code of", errRc)
+		}
 
 		os.Exit(errRc)
 	}
 
 	if contains(randWarnNbrs, randVal) {
-		fmt.Println("WARNING with return code of", warnRc)
+		if verbose {
+			fmt.Println("WARNING with return code of", warnRc)
+		}
 
 		os.Exit(warnRc)
 	}
 
-	fmt.Println("SUCCESS with return code of 0")
+	if verbose {
+		fmt.Println("SUCCESS with return code of 0")
+	}
 }
