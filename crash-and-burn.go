@@ -14,44 +14,18 @@ import (
 const (
 	AppName        = "crash-and-burn"
 	AppVersion     = "1.0.0"
-	AppDescription = "A simple utility for randomly generating error, warning, and success return codes"
+	AppDescription = "A simple utility for randomly generating success and failure return codes"
 )
 
 var (
 	allPctMap = make(map[int]int)
 
 	// Flags
-	verbose     bool
-	errSettings settings.ErrorSettings
-	errPct      int
-	errRc       int
-	sleepTime   int
-	sleepDur    time.Duration
+	verbose   bool
+	failRCs   settings.FailureRCs
+	sleepTime int
+	sleepDur  time.Duration
 )
-
-func validateFlags() {
-	validRC := 33
-
-	if err := errSettings.Validate(); err != nil {
-		fmt.Println(err)
-		os.Exit(validRC)
-	}
-
-	if errPct < 0 || errPct > 100 {
-		fmt.Printf("error percentage (%d) must be between 0 and 100\n", errPct)
-		os.Exit(validRC)
-	}
-
-	if errRc < 0 || errRc > 255 {
-		fmt.Printf("error return code (%d) must be between 0 and 255\n", errRc)
-		os.Exit(validRC)
-	}
-
-	if sleepTime < 0 {
-		fmt.Printf("sleep time (%d) must be greater than or equal to 0\n", sleepTime)
-		os.Exit(validRC)
-	}
-}
 
 // genRandomNumbers generate a slice of random numbers based on the percentage
 func genRandomNumbers(pct int) []int {
@@ -60,11 +34,14 @@ func genRandomNumbers(pct int) []int {
 	i := 0
 
 	for i < pct {
-		randNbr := rand.Int() % 100
+		randNbr := rand.Int() % 101
 
 		if !contains(randNbrs, randNbr) {
-			randNbrs = append(randNbrs, randNbr)
-			i++
+			if _, exists := allPctMap[randNbr]; exists {
+				delete(allPctMap, randNbr)
+				randNbrs = append(randNbrs, randNbr)
+				i++
+			}
 		}
 	}
 
@@ -89,24 +66,12 @@ func pluralize(count int) string {
 	return "s"
 }
 
-func doSleep() {
-	if verbose {
-		fmt.Println("")
-		fmt.Printf("Sleeping for %d second%s...\n", sleepTime, pluralize(sleepTime))
-	}
-
-	time.Sleep(sleepDur)
-
-	if verbose {
-		fmt.Println("")
-	}
-}
-
 func init() {
+	es := settings.FailureRCs{}
+	es.Set("2,2")
+
 	// Setup flags
-	pflag.Var(&errSettings, "set-err", "set error return code and percentage in the format code,percentage. If no --set-err flag is provided, the default is 2,30")
-	pflag.IntVarP(&errPct, "err-pct", "p", 2, "set the error percentage (between 0-100)")
-	pflag.IntVarP(&errRc, "err-rc", "r", 99, "set the error return code (between 0-255)")
+	pflag.VarP(&failRCs, "set-fail", "f", "set the percentage of a specified failure return code, The format is rc,percentage. Can be set multiple times. Return codes must be between 1 and 255 and percentages must be between 1 and 100.")
 	pflag.IntVarP(&sleepTime, "sleep", "s", 0, "set the sleep time in seconds (must be greater or equal to 0) (default: random value between 0-10 seconds)")
 	pflag.BoolVarP(&verbose, "verbose", "v", false, "enable verbose output")
 	pflag.BoolP("help", "h", false, fmt.Sprintf("help for %s", AppName))
@@ -136,11 +101,15 @@ func init() {
 		sleepTime = rand.Int() % 11
 	}
 
-	if !pflag.Lookup("set-err").Changed {
-		errSettings = append(errSettings, settings.ErrorSetting{RC: 30, Pct: 2})
+	if sleepTime < 0 {
+		fmt.Printf("sleep time (%d) must be greater than or equal to 0\n", sleepTime)
+		fmt.Printf("Usage: %s [flags]\n", os.Args[0])
+		fmt.Println("")
+		fmt.Println("Flags:")
+		pflag.PrintDefaults()
+		fmt.Printf("sleep time (%d) must be greater than or equal to 0\n", sleepTime)
+		os.Exit(2)
 	}
-
-	validateFlags()
 
 	sleepDur = time.Duration(sleepTime) * time.Second
 
@@ -151,37 +120,48 @@ func init() {
 
 func main() {
 	if verbose {
-		fmt.Printf("Welcome to %s, v%s\n", AppName, AppVersion)
+		fmt.Printf("%s, v%s\n", AppName, AppVersion)
 		fmt.Println("")
-		fmt.Println("Using the following settings:")
-		fmt.Println("    - Sleep time:", sleepDur.String())
-		fmt.Println("    - Error Settings:")
+		fmt.Println("Sleep time will be:", sleepDur.String())
+		fmt.Println("Return Code Settings:")
 
-		for i := 0; i < len(errSettings); i++ {
-			fmt.Printf("        - RC: %d (%d%%)\n", errSettings[i].RC, errSettings[i].Pct)
+		if failRCs.TotalPct() < 100 {
+			succPct := 100 - failRCs.TotalPct()
+			fmt.Printf("    - RC: 0 (%d%%) [SUCCESS]\n", succPct)
+		}
+
+		for i := 0; i < len(failRCs); i++ {
+			fmt.Printf("    - RC: %d (%d%%) [FAILURE]\n", failRCs[i].RC, failRCs[i].Pct)
 		}
 	}
 
-	randErrNbrs := genRandomNumbers(errPct)
+	// Assign random values to the failure RCs based on percentage
+	for i := 0; i < len(failRCs); i++ {
+		failRCs[i].RandValues = genRandomNumbers(failRCs[i].Pct)
+	}
 
 	if verbose {
 		fmt.Println("")
+		fmt.Printf("Sleeping for %d second%s...\n", sleepTime, pluralize(sleepTime))
+	}
 
-		for i := 0; i < len(randErrNbrs); i++ {
-			fmt.Println("Randomly Generated Error number:", randErrNbrs[i])
-		}
+	time.Sleep(sleepDur)
+
+	if verbose {
+		fmt.Println("")
 	}
 
 	randVal := rand.Int() % 100
 
-	doSleep()
+	// Check if the random value is in the failure RCs
+	for i := 0; i < len(failRCs); i++ {
+		if contains(failRCs[i].RandValues, randVal) {
+			if verbose {
+				fmt.Println("FAILURE with return code of", failRCs[i].RC)
+			}
 
-	if contains(randErrNbrs, randVal) {
-		if verbose {
-			fmt.Println("ERROR with return code of", errRc)
+			os.Exit(failRCs[i].RC)
 		}
-
-		os.Exit(errRc)
 	}
 
 	if verbose {
