@@ -1,21 +1,15 @@
-# crash-and-burn
+# :fire: crash-and-burn
 
 <a href="https://github.com/engmtcdrm/crash-and-burn/actions"><img src="https://github.com/engmtcdrm/crash-and-burn/actions/workflows/build.yml/badge.svg?branch=main" alt="Build Status"></a>
 
-A simple utility for randomly generating error, warning, and success return codes.
+A simple utility for randomly generating success and failure return codes.
 
-This utility program is meant to be used for development of other programs that may call subprocesses to do something.
+This utility program is meant to be used when developing other programs that call subprocesses.
 
-## Usage
-
-```sh
-crash-and-burn
-```
-
-### With Flags
+## :zap: Usage
 
 ```sh
-crash-and-burn -r
+crash-and-burn [flags]
 ```
 
 ## Flags
@@ -24,11 +18,27 @@ All options are optional.
 
 | Flag(s) | Description |
 | ------- | ----------- |
-| `--err-pct`       | Set the error percentage (default: `2`) |
-| `--err-rc`        | Set the error return code (default: `99`) |
-| `--warn-pct`      | Set the warning percentage (default: `30`) |
-| `--warn-rc`       | Set the warning return code (default: `1`) |
-| `-s`, `--sleep`   | Set the sleep time in seconds (default: `random`) |
-| `-d`, `--debug`   | Enable debug mode |
-| `-h`, `--help`    | help for crash-and-burn |
-| `-v`, `--version` | version for crash-and-burn |
+| `-f`, `--set-fail` | set the percentage of a specified failure return code, The format is rc,percentage. Can be set multiple times. Return codes must be between 1 and 255 and percentages must be between 1 and 100. |
+| `-s`, `--sleep`    | set the sleep time in seconds (must be greater or equal to 0) (default: random value between 0-10 seconds) |
+| `-v`, `--verbose`  | enable verbose output |
+| `-h`, `--help`     | help for crash-and-burn |
+| `--version`        | version for crash-and-burn |
+
+## Examples
+
+### Single Failure RC
+
+Return Code of `2` and percentage of `30`
+
+```sh
+crash-and-burn -f 2,30
+```
+
+### Multiple Failure RCs
+
+Return Code of `2` and percentage of `30`
+Return Code of `1` and percentage of `10`
+
+```sh
+crash-and-burn -f 2,30 -f 1,10
+```
