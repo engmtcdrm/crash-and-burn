@@ -48,9 +48,10 @@ func (e *FailureRCs) Set(value string) error {
 
 // Type returns the type of the FailureRC type
 func (e *FailureRCs) Type() string {
-	return "FailureRC"
+	return "int,int"
 }
 
+// TotalPct returns the total percentage of all the FailureRC types
 func (e *FailureRCs) TotalPct() int {
 	pctTotal := 0
 
@@ -61,6 +62,7 @@ func (e *FailureRCs) TotalPct() int {
 	return pctTotal
 }
 
+// exists checks if a return code already exists in the FailureRC type
 func (e *FailureRCs) exists(rc int) bool {
 	for _, es := range *e {
 		if es.RC == rc {
