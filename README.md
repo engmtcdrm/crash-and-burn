@@ -1,6 +1,6 @@
 # :fire: crash-and-burn
 
-<a href="https://github.com/engmtcdrm/crash-and-burn/actions"><img src="https://github.com/engmtcdrm/crash-and-burn/actions/workflows/build.yml/badge.svg?branch=main" alt="Build Status"></a>
+[![Go](https://github.com/engmtcdrm/crash-and-burn/actions/workflows/build.yml/badge.svg)](https://github.com/engmtcdrm/crash-and-burn/actions/workflows/build.yml)
 
 A simple utility for randomly generating success and failure return codes.
 
