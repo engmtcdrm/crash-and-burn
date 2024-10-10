@@ -28,7 +28,7 @@ All options are optional.
 
 ### Single Failure RC
 
-Return Code of `2` and percentage of `30`
+- Return Code of `2` and percentage of `30`
 
 ```sh
 crash-and-burn -f 2,30
@@ -36,8 +36,8 @@ crash-and-burn -f 2,30
 
 ### Multiple Failure RCs
 
-Return Code of `2` and percentage of `30`
-Return Code of `1` and percentage of `10`
+- Return Code of `2` and percentage of `30`
+- Return Code of `1` and percentage of `10`
 
 ```sh
 crash-and-burn -f 2,30 -f 1,10
