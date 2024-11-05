@@ -135,7 +135,6 @@ func main() {
 	if verbose {
 		fmt.Printf("%s, %s\n", app.Name, app.Version)
 		fmt.Println("")
-		fmt.Println("Sleep time will be:", sleepDur.String())
 		fmt.Println("Return Code Settings:")
 
 		if failRCs.TotalPct() < 100 {
