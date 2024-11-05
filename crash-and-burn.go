@@ -4,17 +4,13 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"regexp"
 	"time"
 
 	"github.com/spf13/pflag"
 
+	"crash-and-burn/app"
 	"crash-and-burn/settings"
-)
-
-const (
-	AppName        = "crash-and-burn"
-	AppVersion     = "1.0.0"
-	AppDescription = "A simple utility for randomly generating success and failure return codes"
 )
 
 var (
@@ -66,6 +62,23 @@ func pluralize(count int) string {
 	return "s"
 }
 
+// getSemVer returns the semantic version of the input string if it
+// matches the pattern `vX.Y.Z`. Otherwise, it returns the input string.
+func getSemVer(input string) string {
+	// Define the regular expression for semantic versioning
+	re := regexp.MustCompile(`^v?(\d+\.\d+\.\d+)$`)
+
+	match := re.FindStringSubmatch(input)
+
+	// If there's a match return the semantic version
+	if len(match) > 1 {
+		return match[1]
+	}
+
+	// If no match, return the original input
+	return input
+}
+
 func init() {
 	es := settings.FailureRCs{}
 	es.Set("2,2")
@@ -73,16 +86,16 @@ func init() {
 	// Setup flags
 	pflag.VarP(&failRCs, "set-fail", "f", "set the percentage of a specified failure return code, The format is rc,percentage. Can be set multiple times. Return codes must be between 1 and 255 and percentages must be between 1 and 100.")
 	pflag.IntVarP(&sleepTime, "sleep", "s", 0, "set the sleep time in seconds (must be greater or equal to 0) (default: random value between 0-10 seconds)")
-	pflag.BoolVarP(&verbose, "verbose", "v", false, "enable verbose output")
-	pflag.BoolP("help", "h", false, fmt.Sprintf("help for %s", AppName))
-	pflag.Bool("version", false, fmt.Sprintf("version of %s", AppName))
+	pflag.BoolVarP(&verbose, "verbose", "V", false, "enable verbose output")
+	pflag.BoolP("help", "h", false, fmt.Sprintf("help for %s", app.Name))
+	pflag.BoolP("version", "v", false, fmt.Sprintf("version of %s", app.Name))
 	pflag.CommandLine.SortFlags = false
 
 	pflag.Parse()
 
 	// Handle flags
 	if pflag.Lookup("help").Changed {
-		fmt.Println(AppDescription)
+		fmt.Println(app.Description)
 		fmt.Println("")
 		fmt.Printf("Usage: %s [flags]\n", os.Args[0])
 		fmt.Println("")
@@ -92,7 +105,7 @@ func init() {
 	}
 
 	if pflag.Lookup("version").Changed {
-		fmt.Printf("%s version %s\n", AppName, AppVersion)
+		fmt.Printf("%s version %s\n", app.Name, getSemVer(app.Version))
 		os.Exit(0)
 	}
 
@@ -120,7 +133,7 @@ func init() {
 
 func main() {
 	if verbose {
-		fmt.Printf("%s, v%s\n", AppName, AppVersion)
+		fmt.Printf("%s, %s\n", app.Name, app.Version)
 		fmt.Println("")
 		fmt.Println("Sleep time will be:", sleepDur.String())
 		fmt.Println("Return Code Settings:")
