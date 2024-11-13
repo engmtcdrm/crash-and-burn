@@ -84,11 +84,11 @@ func init() {
 	es.Set("2,2")
 
 	// Setup flags
-	pflag.VarP(&failRCs, "set-fail", "f", "set the percentage of a specified failure return code, The format is rc,percentage. Can be set multiple times. Return codes must be between 1 and 255 and percentages must be between 1 and 100.")
-	pflag.IntVarP(&sleepTime, "sleep", "s", 0, "set the sleep time in seconds (must be greater or equal to 0) (default: random value between 0-10 seconds)")
-	pflag.BoolVarP(&verbose, "verbose", "V", false, "enable verbose output")
-	pflag.BoolP("help", "h", false, fmt.Sprintf("help for %s", app.Name))
-	pflag.BoolP("version", "v", false, fmt.Sprintf("version of %s", app.Name))
+	pflag.VarP(&failRCs, "set-fail", "f", "Set the percentage of a specified failure return code, The format is rc,percentage. This flag can be set multiple times. Return codes must be between 1 and 255 and percentages must be between 1 and 100.")
+	pflag.IntVarP(&sleepTime, "sleep", "s", 0, "Set the sleep time in seconds (must be greater or equal to 0) (default: random value between 0-10 seconds)")
+	pflag.BoolVarP(&verbose, "verbose", "V", false, "Enable verbose output")
+	pflag.BoolP("help", "h", false, fmt.Sprintf("Help for %s", app.Name))
+	pflag.BoolP("version", "v", false, fmt.Sprintf("Version of %s", app.Name))
 	pflag.CommandLine.SortFlags = false
 
 	pflag.Parse()
