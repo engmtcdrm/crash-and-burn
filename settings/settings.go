@@ -1,6 +1,9 @@
 package settings
 
-import "fmt"
+import (
+	"fmt"
+	"regexp"
+)
 
 type FailureRC struct {
 	RC         int
@@ -19,6 +22,12 @@ func (e *FailureRCs) String() string {
 // Set parses the input string and sets the value of the FailureRC type
 func (e *FailureRCs) Set(value string) error {
 	var pct, rc int
+
+	validInput := regexp.MustCompile(`^\d+,\d+$`)
+
+	if !validInput.MatchString(value) {
+		return fmt.Errorf("invalid format: input must be two integers separated by a comma")
+	}
 
 	_, err := fmt.Sscanf(value, "%d,%d", &rc, &pct)
 	if err != nil {
