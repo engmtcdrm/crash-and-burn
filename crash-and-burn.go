@@ -80,9 +80,6 @@ func getSemVer(input string) string {
 }
 
 func init() {
-	es := settings.FailureRCs{}
-	es.Set("2,2")
-
 	// Setup flags
 	pflag.VarP(&failRCs, "set-fail", "f", "Set the percentage of a specified failure return code, The format is rc,percentage. This flag can be set multiple times. Return codes must be between 1 and 255 and percentages must be between 1 and 100.")
 	pflag.IntVarP(&sleepTime, "sleep", "s", 0, "Set the sleep time in seconds (must be greater or equal to 0) (default: random value between 0-10 seconds)")
