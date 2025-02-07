@@ -43,7 +43,7 @@ func (e *FailureRCs) Set(value string) error {
 	}
 
 	if !e.exists(rc) {
-		if e.TotalPct() < 100 {
+		if e.TotalPct()+pct < 100 {
 			*e = append(*e, FailureRC{RC: rc, Pct: pct})
 		} else {
 			fmt.Printf("Total failure percentage is at or over 100. Return code (%d) and percentage (%d) will not be added.\n", rc, pct)
