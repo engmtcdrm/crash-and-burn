@@ -9,8 +9,8 @@ import (
 
 	"github.com/spf13/pflag"
 
-	"crash-and-burn/app"
-	"crash-and-burn/settings"
+	"github.com/engmtcdrm/crash-and-burn/app"
+	"github.com/engmtcdrm/crash-and-burn/settings"
 )
 
 var (

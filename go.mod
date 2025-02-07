@@ -1,4 +1,4 @@
-module crash-and-burn
+module github.com/engmtcdrm/crash-and-burn
 
 go 1.23.0
 
