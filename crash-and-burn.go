@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
-	"regexp"
 	"time"
 
 	"github.com/spf13/pflag"
@@ -62,23 +61,6 @@ func pluralize(count int) string {
 	return "s"
 }
 
-// getSemVer returns the semantic version of the input string if it
-// matches the pattern `vX.Y.Z`. Otherwise, it returns the input string.
-func getSemVer(input string) string {
-	// Define the regular expression for semantic versioning
-	re := regexp.MustCompile(`^v?(\d+\.\d+\.\d+)$`)
-
-	match := re.FindStringSubmatch(input)
-
-	// If there's a match return the semantic version
-	if len(match) > 1 {
-		return match[1]
-	}
-
-	// If no match, return the original input
-	return input
-}
-
 func init() {
 	// Setup flags
 	pflag.VarP(&failRCs, "set-fail", "f", "Set the percentage of a specified failure return code, The format is rc,percentage. This flag can be set multiple times. Return codes must be between 1 and 255 and percentages must be between 1 and 100.")
@@ -102,7 +84,7 @@ func init() {
 	}
 
 	if pflag.Lookup("version").Changed {
-		fmt.Printf("%s version %s\n", app.Name, getSemVer(app.Version))
+		fmt.Printf("%s version %s\n", app.Name, app.SemVersion())
 		os.Exit(0)
 	}
 
@@ -130,7 +112,7 @@ func init() {
 
 func main() {
 	if verbose {
-		fmt.Printf("%s, %s\n", app.Name, app.Version)
+		fmt.Printf("%s version %s\n", app.Name, app.SemVersion())
 		fmt.Println("")
 		fmt.Println("Return Code Settings:")
 
