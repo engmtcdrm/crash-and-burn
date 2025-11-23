@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	allPctMap = make(map[int]struct{}, 100)
+	allPctMap = map[int]struct{}{}
 
 	// Flags
 	verbose   bool
@@ -106,6 +106,7 @@ func init() {
 
 	sleepDur = time.Duration(sleepTime) * time.Second
 
+	allPctMap = make(map[int]struct{}, 100)
 	for i := 1; i <= 100; i++ {
 		allPctMap[i] = struct{}{}
 	}
