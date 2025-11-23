@@ -5,6 +5,8 @@ import (
 	"regexp"
 )
 
+var validInput = regexp.MustCompile(`^\d+,\d+$`)
+
 type FailureRC struct {
 	RC         int
 	Pct        int
@@ -22,8 +24,6 @@ func (e *FailureRCs) String() string {
 // Set parses the input string and sets the value of the FailureRC type
 func (e *FailureRCs) Set(value string) error {
 	var pct, rc int
-
-	validInput := regexp.MustCompile(`^\d+,\d+$`)
 
 	if !validInput.MatchString(value) {
 		return fmt.Errorf("invalid format: input must be two integers separated by a comma")
