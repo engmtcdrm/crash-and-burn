@@ -23,7 +23,7 @@ builds:
       - windows
       - darwin
     ldflags:
-      - -X github.com/engmtcdrm/crash-and-burn/app.Version={{ .Tag }}
+      - -X github.com/engmtcdrm/crash-and-burn/internal/app.Version={{ .Tag }}
 
 archives:
   - format: zip
