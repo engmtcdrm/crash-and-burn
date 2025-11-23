@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
 	"os"
 	"time"
@@ -13,7 +14,7 @@ import (
 )
 
 var (
-	allPctMap = make(map[int]int)
+	allPctMap = make(map[int]struct{}, 100)
 
 	// Flags
 	verbose   bool
@@ -106,24 +107,37 @@ func init() {
 	sleepDur = time.Duration(sleepTime) * time.Second
 
 	for i := 1; i <= 100; i++ {
-		allPctMap[i] = i
+		allPctMap[i] = struct{}{}
 	}
 }
 
 func main() {
-	if verbose {
-		fmt.Printf("%s version %s\n", app.Name, app.SemVersion())
-		fmt.Println("")
-		fmt.Println("Return Code Settings:")
+	// Turn off all the extra log output
+	log.SetFlags(0)
 
-		if failRCs.TotalPct() < 100 {
-			succPct := 100 - failRCs.TotalPct()
-			fmt.Printf("    - RC: 0 (%d%%) [SUCCESS]\n", succPct)
+	// Throw any logging away if not in verbose mode
+	if !verbose {
+		devNull, err := os.OpenFile(os.DevNull, os.O_WRONLY, 0644)
+		if err != nil {
+			log.Println("Error opening os.DevNull:", err)
+			os.Exit(1)
 		}
+		defer devNull.Close()
 
-		for i := 0; i < len(failRCs); i++ {
-			fmt.Printf("    - RC: %d (%d%%) [FAILURE]\n", failRCs[i].RC, failRCs[i].Pct)
-		}
+		log.SetOutput(devNull)
+	}
+
+	log.Printf("%s version %s\n", app.Name, app.SemVersion())
+	log.Println("")
+	log.Println("Return Code Settings:")
+
+	if failRCs.TotalPct() < 100 {
+		succPct := 100 - failRCs.TotalPct()
+		log.Printf("    - RC: 0 (%d%%) [SUCCESS]\n", succPct)
+	}
+
+	for i := 0; i < len(failRCs); i++ {
+		log.Printf("    - RC: %d (%d%%) [FAILURE]\n", failRCs[i].RC, failRCs[i].Pct)
 	}
 
 	// Assign random values to the failure RCs based on percentage
@@ -131,31 +145,23 @@ func main() {
 		failRCs[i].RandValues = genRandomNumbers(failRCs[i].Pct)
 	}
 
-	if verbose {
-		fmt.Println("")
-		fmt.Printf("Sleeping for %d second%s...\n", sleepTime, pluralize(sleepTime))
-	}
+	log.Println("")
+	log.Printf("Sleeping for %d second%s...\n", sleepTime, pluralize(sleepTime))
 
 	time.Sleep(sleepDur)
 
-	if verbose {
-		fmt.Println("")
-	}
+	log.Println("")
 
 	randVal := rand.Int() % 100
 
 	// Check if the random value is in the failure RCs
 	for i := 0; i < len(failRCs); i++ {
 		if contains(failRCs[i].RandValues, randVal) {
-			if verbose {
-				fmt.Println("FAILURE with return code of", failRCs[i].RC)
-			}
+			log.Println("FAILURE with return code of", failRCs[i].RC)
 
 			os.Exit(failRCs[i].RC)
 		}
 	}
 
-	if verbose {
-		fmt.Println("SUCCESS with return code of 0")
-	}
+	log.Println("SUCCESS with return code of 0")
 }
